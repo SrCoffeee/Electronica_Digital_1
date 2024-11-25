@@ -25,6 +25,7 @@ La tecnología CMOS (Complementary Metal-Oxide-Semiconductor) es una familia de 
 
 Los circuitos CMOS son ampliamente utilizados en sistemas electrónicos modernos, como microprocesadores, memorias y dispositivos integrados, debido a su alta densidad de integración, escalabilidad y capacidad de operar a bajas tensiones. Además, su diseño complementario reduce significativamente las pérdidas de energía, lo que ha permitido el desarrollo de dispositivos más compactos y con mayor duración de batería.
 
+
 ## Simulación
 
 ## Procedimiento
