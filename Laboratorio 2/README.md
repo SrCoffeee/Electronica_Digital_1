@@ -9,7 +9,7 @@ Para este laboratorio, se tuvo el reto de a partir de un problema, diseñar un s
 ### Caja negra
 Después de realizar una valoración del problema, se obtuvo el siguiente resultado de entradas y salidas del sistema.
 
-![caja_negra](Imagenes\caja_negra.png)
+![caja_negra](Imagenes/caja_negra.png)
 
 Donde las variables en verde son las entradas y las en rojo son las salidas, las cuales representan lo siguiente:
 
