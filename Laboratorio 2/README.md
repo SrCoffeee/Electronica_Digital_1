@@ -87,4 +87,12 @@ Por último, se tiene la situación en la cual se activa el interruptor de emerg
 
 ## Dominio estructural (red de compuertas lógicas)
 ##  Descripción en lenguaje HDL (Hardware Description Language)
+
+
 ## Síntesis en FPGA (dominio físico final)
+
+Para este apartado se tiene la implementación fisica del diseño, en donde se implementaron diferentes sensores (puestos en formas de pulsadores) y actuadores, en donde se tiene el relé conmutador, los diodos LEDs, resistencias y baterias, a continuación se muestra el diagrama de planeacion de la propuesta de circuito implementada.
+
+![sintesis_fpga](Imagenes/sintesis_fpga.png)
+
+## Video de FPGA 
