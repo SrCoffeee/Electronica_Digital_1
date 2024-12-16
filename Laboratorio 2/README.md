@@ -86,8 +86,44 @@ En este caso se muestra la ausencia de energía en la residencia al no tener pre
 Por último, se tiene la situación en la cual se activa el interruptor de emergencia (Ei) en la energía (M) en la residencia se corta sin importar que red eléctrica estuviera sumnistrandola.
 
 ## Dominio estructural (red de compuertas lógicas)
+
+### Ladder a compuertas lógicas
+### Implementación en Digital
+### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
 ##  Descripción en lenguaje HDL (Hardware Description Language)
 
+### top.v
+En este apartado nos apoyamos en la herramienta Digital, la cual a partir de un circuito de compuertas propuesto, nos emite un archivo .v en donde relacionaremos entradas, salidas y compuertas. Este archivo será en que procese las señales de entrada que definimos en nuestro diagrama de caja negra y a partir del circuito de compuertas (_procesamiento de señales_), las relacione con las salidas  que le asignamos a nuestro sistema. 
+```
+module top  (
+  input Ei,
+  input A,
+  input B,
+  input C,
+  output CM,
+  output M
+);
+  assign CM = (~ B & C);
+  assign M = ((A & ~ Ei) | (B & ~ Ei) | (C & ~ Ei));
+endmodule
+```
+
+Aquí presenciamos como tendriamos 4 entradas o inputs, correspondientes a los 3 sensores y al boton de paro de emergencia, así como una dos salidas, una para el conmutador de red y la conmutación de presencia o no de luz. Asímismo se idenfican en la salida CM una compuerta AND entre la entrada C y la entrada B negada, en tanto que para nuestra salida M, tendriamos tres compuertas AND correspondientes a las entradas de los sensores cada uno con la negación del paro de emergencia y todo ello conjugado en una compuerta OR.
+
+### Asignación de pines
+Para la asignación de pines, se comprueba en la FPGA la ubicación de los pines y se asignan de manera arbitraria los pines para cada entrada y salida de nuestro circuito.
+
+```
+## ASIGNACIÓN DE PINES ##
+#Entradas
+set_location_assignment PIN_28 -to A
+set_location_assignment PIN_31 -to B
+set_location_assignment PIN_33 -to C
+set_location_assignment PIN_38 -to Ei
+#Salidas
+set_location_assignment PIN_51 -to CM
+set_location_assignment PIN_53 -to M
+```
 
 ## Síntesis en FPGA (dominio físico final)
 
@@ -96,3 +132,5 @@ Para este apartado se tiene la implementación fisica del diseño, en donde se i
 ![sintesis_fpga](Imagenes/sintesis_fpga.png)
 
 ## Video de FPGA 
+
+Puedes ver el video de la implementación de la FPGA [aquí](URL_DEL_VIDEO).
