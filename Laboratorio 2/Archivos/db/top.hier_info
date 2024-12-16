@@ -1,0 +1,13 @@
+|top
+Ei => M.IN0
+Ei => M.IN0
+Ei => M.IN0
+A => M.IN1
+B => M.IN1
+B => CM.IN0
+C => CM.IN1
+C => M.IN1
+CM <= CM.DB_MAX_OUTPUT_PORT_TYPE
+M <= M.DB_MAX_OUTPUT_PORT_TYPE
+
+

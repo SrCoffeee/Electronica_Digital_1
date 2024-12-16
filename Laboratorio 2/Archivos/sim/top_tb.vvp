@@ -1,0 +1,77 @@
+#! /usr/bin/env bash
+exec /home/charlie/miniconda3/envs/digital/bin/vvp -f "$0" "$@" <<'# EOF'
+:ivl_version "13.0 (devel)" "(0_8-6859-gf50cc35d2-dirty)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision - 8;
+:vpi_module "/home/charlie/miniconda3/envs/digital/lib/ivl/system.vpi";
+:vpi_module "/home/charlie/miniconda3/envs/digital/lib/ivl/vhdl_sys.vpi";
+:vpi_module "/home/charlie/miniconda3/envs/digital/lib/ivl/vhdl_textio.vpi";
+:vpi_module "/home/charlie/miniconda3/envs/digital/lib/ivl/v2005_math.vpi";
+:vpi_module "/home/charlie/miniconda3/envs/digital/lib/ivl/va_math.vpi";
+S_0xf49200 .scope module, "top_tb" "top_tb" 2 20;
+ .timescale -8 -8;
+P_0xf33f80 .param/l "INPUT_SIZE" 0 2 22, +C4<00000000000000000000000000000001>;
+P_0xf33fc0 .param/l "OUTPUT_SIZE" 0 2 23, +C4<00000000000000000000000000000001>;
+v0xf5e310_0 .var "inputs", 0 0;
+RS_0x7fdc7b2d5048 .resolv tri, L_0xf5e540, L_0xf5eb50;
+v0xf5e3f0_0 .net8 "probe", 0 0, RS_0x7fdc7b2d5048;  2 drivers
+S_0xf49430 .scope module, "dut" "top" 2 91, 3 2 0, S_0xf49200;
+ .timescale -8 -8;
+    .port_info 0 /INPUT 1 "Ei";
+    .port_info 1 /INPUT 1 "A";
+    .port_info 2 /INPUT 1 "B";
+    .port_info 3 /INPUT 1 "C";
+    .port_info 4 /OUTPUT 1 "CM";
+    .port_info 5 /OUTPUT 1 "M";
+L_0xf5e4b0 .functor NOT 1, v0xf5e310_0, C4<0>, C4<0>, C4<0>;
+L_0xf5e540 .functor AND 1, L_0xf5e4b0, v0xf5e310_0, C4<1>, C4<1>;
+L_0xf5e5d0 .functor NOT 1, v0xf5e310_0, C4<0>, C4<0>, C4<0>;
+L_0xf5e660 .functor AND 1, v0xf5e310_0, L_0xf5e5d0, C4<1>, C4<1>;
+L_0xf5e750 .functor NOT 1, v0xf5e310_0, C4<0>, C4<0>, C4<0>;
+L_0xf5e7c0 .functor AND 1, v0xf5e310_0, L_0xf5e750, C4<1>, C4<1>;
+L_0xf5e8c0 .functor OR 1, L_0xf5e660, L_0xf5e7c0, C4<0>, C4<0>;
+L_0xf5e9d0 .functor NOT 1, v0xf5e310_0, C4<0>, C4<0>, C4<0>;
+L_0xf5ea90 .functor AND 1, v0xf5e310_0, L_0xf5e9d0, C4<1>, C4<1>;
+L_0xf5eb50 .functor OR 1, L_0xf5e8c0, L_0xf5ea90, C4<0>, C4<0>;
+v0xf0f210_0 .net "A", 0 0, v0xf5e310_0;  1 drivers
+v0xf5d7d0_0 .net "B", 0 0, v0xf5e310_0;  alias, 1 drivers
+v0xf5d890_0 .net "C", 0 0, v0xf5e310_0;  alias, 1 drivers
+v0xf5d980_0 .net8 "CM", 0 0, RS_0x7fdc7b2d5048;  alias, 2 drivers
+v0xf5da20_0 .net "Ei", 0 0, v0xf5e310_0;  alias, 1 drivers
+v0xf5db10_0 .net8 "M", 0 0, RS_0x7fdc7b2d5048;  alias, 2 drivers
+v0xf5dbb0_0 .net *"_ivl_0", 0 0, L_0xf5e4b0;  1 drivers
+v0xf5dc50_0 .net *"_ivl_10", 0 0, L_0xf5e7c0;  1 drivers
+v0xf5dd10_0 .net *"_ivl_12", 0 0, L_0xf5e8c0;  1 drivers
+v0xf5ddf0_0 .net *"_ivl_14", 0 0, L_0xf5e9d0;  1 drivers
+v0xf5ded0_0 .net *"_ivl_16", 0 0, L_0xf5ea90;  1 drivers
+v0xf5dfb0_0 .net *"_ivl_4", 0 0, L_0xf5e5d0;  1 drivers
+v0xf5e090_0 .net *"_ivl_6", 0 0, L_0xf5e660;  1 drivers
+v0xf5e170_0 .net *"_ivl_8", 0 0, L_0xf5e750;  1 drivers
+    .scope S_0xf49200;
+T_0 ;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v0xf5e310_0, 0, 1;
+    %delay 2, 0;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v0xf5e310_0, 0, 1;
+    %delay 2, 0;
+    %vpi_call 2 30 "$finish" {0 0 0};
+    %end;
+    .thread T_0;
+    .scope S_0xf49200;
+T_1 ;
+    %vpi_call 2 101 "$monitor", "Time: %t, out = %d", $time, v0xf5e3f0_0 {0 0 0};
+    %end;
+    .thread T_1;
+    .scope S_0xf49200;
+T_2 ;
+    %vpi_call 2 105 "$dumpvars", 32'sb00000000000000000000000000000000, S_0xf49200 {0 0 0};
+    %end;
+    .thread T_2;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "top_tb.v";
+    "././top.v";
+# EOF

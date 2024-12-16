@@ -1,0 +1,38 @@
+$date
+	Thu Dec 12 12:29:40 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	10ns
+$end
+$scope module top_tb $end
+$var wire 1 ! probe $end
+$var parameter 32 " INPUT_SIZE $end
+$var parameter 32 # OUTPUT_SIZE $end
+$var reg 1 $ inputs $end
+$scope module dut $end
+$var wire 1 $ A $end
+$var wire 1 $ B $end
+$var wire 1 $ C $end
+$var wire 1 ! CM $end
+$var wire 1 $ Ei $end
+$var wire 1 ! M $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1 #
+b1 "
+$end
+#0
+$dumpvars
+0$
+0!
+$end
+#2
+0!
+1$
+#4
