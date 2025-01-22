@@ -88,8 +88,25 @@ Por último, se tiene la situación en la cual se activa el interruptor de emerg
 ## Dominio estructural (red de compuertas lógicas)
 
 ### Ladder a compuertas lógicas
-### Implementación en Digital
+Partiendo del analisis y el comprotamiento esperado se deduce que el uso una compuesta or pro cada entrada de sensor es suficiente, de usa esta compuerta junto a la señal negada del paro de emergencia. esto para la seleccion de la posicion del selector.
+Para el contactor que habilita la alimentacion a la carga solo se requiere saber si las baterias se encuentran con carga o si la red se encuentra habilitada, por lo que se considera la señal negada del sensor de baterias junto con el estado de la red electrica para habilitar este contactor, de manera que el circuito de compuertas logicas seria el siguiente:
+
+![Circuito logicas](Imagenes/Diagrama_Compuertas.png)
+
+
 ### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
+
+Al simular el circuito mostrado anteriormente, el programa es capaz de determinar la tabla d everdad del mismo, de manera que:
+
+![CTabla de verdad](Imagenes/Tabla_de_Verdad.png)
+
+Se puede evidenciar que esta tabla concueerda con la tabla de verdad propuesta en el dominio comportamental.
+
+De igual forma, se obtiene la ecuacion booleana que describe la logica de este circuito:
+
+![Ecuación Logica](Imagenes/Boole.png)
+
+
 ##  Descripción en lenguaje HDL (Hardware Description Language)
 
 ### top.v
