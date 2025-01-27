@@ -146,7 +146,7 @@ set_location_assignment PIN_53 -to M
 
 Para este apartado se tiene la implementación fisica del diseño, en donde se implementaron diferentes sensores (puestos en formas de pulsadores) y actuadores, en donde se tiene el relé conmutador, los diodos LEDs, resistencias y baterias, a continuación se muestra el diagrama de planeacion de la propuesta de circuito implementada.
 
-![sintesis_fpga](Imagenes/sintesis_fpga.png)
+<!-- ![sintesis_fpga](Imagenes/sintesis_fpga.png) -->
 
 ## Video de FPGA 
 
