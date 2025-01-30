@@ -150,4 +150,4 @@ Para este apartado se tiene la implementación fisica del diseño, en donde se i
 
 ## Video de FPGA 
 
-Puedes ver el video de la implementación de la FPGA https://www.youtube.com/watch?v=xz67W84lecs
+Puedes ver el video de la implementación de la FPGA [aquí](https://www.youtube.com/watch?v=xz67W84lecs)
