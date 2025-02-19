@@ -41,22 +41,43 @@ Esto permite mostrar el voltaje medido en tiempo real de forma clara y precisa.
 
 #### Entradas
 
+Para el dispositivo, se recibira la señal directamente del tomacorriente , donde se recivira la onda AC.
+
 #### Salidas
 
-### Tabla de verdad 
+Se tendran tres salidas, 3 paneles 7 segmentos en los cuales se mostrara las unidades, decenas y centenas del la magnitud de la red.
 
-### Diagrama de flujo
+### Tabla de verdad 
+En la siguiente imagen se muestran unos de los casos del sistema, en resumen al ingresar la señal de 8bits saliente del ADC, estos seran transformados en la señal optima para ser presentado en los display 7 segmentos, por lo que primero se separan por unidades, decenas y centenas y estos valores con convertidos a base 10 y presentados en los displays.
+
+![Tabla de Verdad](Imagenes/TABLA%20DE%20VERDAD.png)
+
 
 ## Dominio físico inicial (circuito eléctrico):
-### Representación circuital
+
+La primer fase del dispositivo es la toma de la señal de la red, se transforma a una señal rectificada cercana a los 5V, parasa por un diodo Zener con conexion shunt, de manera ue se regula la tension de salida, este valor DC ingresa al ADC para tener una salida de 8bits que ira a la FPGA.
 
 ## Dominio estructural (red de compuertas lógicas)
 
-### Ladder a compuertas lógicas
+Gracias a la descriocion de la tabla de verdad, es posible determinar el circuito digital que pueda realizar la trtansformacion de la informacion para darle el uso deseado.
+
+![Conversor 8Bits a decimal](Imagenes/BIN.DEC27SEG.png)
+
+Ya con la informacion de esta manera, se convierte la señal por medio de un driver a 7 segmentos, para hacer uso de los 7 segmentos incorporados en la FPGA.
+
+![Conversor 8Bits a decimal](Imagenes/BIN2DEC%208BITS.png)
+
+Por ultimo se simula con un panel 7 segmentos propio de DIGITAL, en donde se comprueba el correcto funcionamiento del dispositivo.
+
+![Conversor 8Bits a decimal](Imagenes/BIN.DEC27SEG%20TEST.png)
 
 ### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
 
+
+
 ##  Descripción en lenguaje HDL (Hardware Description Language)
+
+EL circuito descrito anteriormente se describe en el codigo .v, adjunto a esta entrega.
 
 
 ### Asignación de pines
