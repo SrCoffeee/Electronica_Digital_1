@@ -9,7 +9,7 @@ Para este laboratorio, se tuvo el reto de a partir de un problema, diseñar un s
 ### Caja negra
 Después de realizar una valoración del problema, se obtuvo el siguiente resultado de entradas y salidas del sistema.
 
-![caja_negra](Imagenes\caja_negra.png)
+![caja_negra](Imagenes/caja_negra.png)
 
 Donde las variables en verde son las entradas y las en rojo son las salidas, las cuales representan lo siguiente:
 
@@ -88,8 +88,25 @@ Por último, se tiene la situación en la cual se activa el interruptor de emerg
 ## Dominio estructural (red de compuertas lógicas)
 
 ### Ladder a compuertas lógicas
-### Implementación en Digital
+Partiendo del analisis y el comprotamiento esperado se deduce que el uso una compuesta or pro cada entrada de sensor es suficiente, de usa esta compuerta junto a la señal negada del paro de emergencia. esto para la seleccion de la posicion del selector.
+Para el contactor que habilita la alimentacion a la carga solo se requiere saber si las baterias se encuentran con carga o si la red se encuentra habilitada, por lo que se considera la señal negada del sensor de baterias junto con el estado de la red electrica para habilitar este contactor, de manera que el circuito de compuertas logicas seria el siguiente:
+
+![Circuito logicas](Imagenes/Diagrama_Compuertas.png)
+
+
 ### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
+
+Al simular el circuito mostrado anteriormente, el programa es capaz de determinar la tabla d everdad del mismo, de manera que:
+
+![CTabla de verdad](Imagenes/Tabla_de_Verdad.png)
+
+Se puede evidenciar que esta tabla concueerda con la tabla de verdad propuesta en el dominio comportamental.
+
+De igual forma, se obtiene la ecuacion booleana que describe la logica de este circuito:
+
+![Ecuación Logica](Imagenes/Boole.png)
+
+
 ##  Descripción en lenguaje HDL (Hardware Description Language)
 
 ### top.v
@@ -129,8 +146,8 @@ set_location_assignment PIN_53 -to M
 
 Para este apartado se tiene la implementación fisica del diseño, en donde se implementaron diferentes sensores (puestos en formas de pulsadores) y actuadores, en donde se tiene el relé conmutador, los diodos LEDs, resistencias y baterias, a continuación se muestra el diagrama de planeacion de la propuesta de circuito implementada.
 
-![sintesis_fpga](Imagenes/sintesis_fpga.png)
+<!-- ![sintesis_fpga](Imagenes/sintesis_fpga.png) -->
 
 ## Video de FPGA 
 
-Puedes ver el video de la implementación de la FPGA [aquí](URL_DEL_VIDEO).
+Puedes ver el video de la implementación de la FPGA [aquí](https://www.youtube.com/watch?v=xz67W84lecs)
