@@ -298,4 +298,4 @@ set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.1 Lite Edition"
 
 
 
-Puedes ver el video de la implementación [aquí]()
+Puedes ver el video de la implementación [aquí](https://www.youtube.com/watch?v=d8CnSRoFc4Q)
