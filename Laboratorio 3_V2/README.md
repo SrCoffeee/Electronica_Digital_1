@@ -188,66 +188,60 @@ endmodule
 Este módulo encapsula la información de los otros módulos, asociando las entradas y salidas con los pines digitales.
 
 ```
-module seven_segment_driver (
+`include "seven_segment_driver.v"
+`include "binary_to_bcd.v"
+`include "adc_control.v"
+`include "clk_divider.v"
+module top (
     input wire clk,
     input wire reset_n,
-    input wire [3:0] digit0,
-    input wire [3:0] digit1,
-    input wire [3:0] digit2,
-    output reg [6:0] segmentos,
-    output reg [2:0] anodos
+    input wire [7:0] adc_data,
+    input wire eoc,
+    output wire adc_clk,
+    output wire start,
+    output wire oe,
+    output wire add_a,
+    output wire add_b,
+    output wire add_c,
+    output wire [6:0] segmentos,
+    output wire [2:0] anodos
 );
 
-reg [1:0] contador;
-reg [15:0] prescaler;
-reg [3:0] digito_actual;
+// Instancias
+clk_divider clk_div_adc (
+    .CLK_IN(clk),
+    .CLK_OUT(adc_clk)
+);
 
-always @(*) begin
-    case (digito_actual)
-        4'h0: segmentos = 7'b1000000;
-        4'h1: segmentos = 7'b1111001;
-        4'h2: segmentos = 7'b0100100;
-        4'h3: segmentos = 7'b0110000;
-        4'h4: segmentos = 7'b0011001;
-        4'h5: segmentos = 7'b0010010;
-        4'h6: segmentos = 7'b0000010;
-        4'h7: segmentos = 7'b1111000;
-        4'h8: segmentos = 7'b0000000;
-        4'h9: segmentos = 7'b0010000;
-        default: segmentos = 7'b1111111;
-    endcase
-end
+adc_control adc_ctrl (
+    .clk(clk),
+    .reset_n(reset_n),
+    .eoc(eoc),
+    .start(start),
+    .oe(oe),
 
-always @(posedge clk or negedge reset_n) begin
-    if (!reset_n) begin
-        prescaler <= 0;
-        contador <= 0;
-        anodos <= 3'b111;
-    end else begin
-        if (prescaler == 16'd50000) begin
-            prescaler <= 0;
-            case (contador)
-                2'b00: begin
-                    digito_actual <= digit0;
-                    anodos <= 3'b110;
-                end
-                2'b01: begin
-                    digito_actual <= digit1;
-                    anodos <= 3'b101;
-                end
-                2'b10: begin
-                    digito_actual <= digit2;
-                    anodos <= 3'b011;
-                end
-            endcase
-            contador <= contador + 1;
-        end else begin
-            prescaler <= prescaler + 1;
-        end
-    end
-end
+);
+
+wire [3:0] hundreds, tens, unit;
+binary_to_bcd bcd_conv (
+    .binary(adc_data),
+    .hundreds(hundreds),
+    .tens(tens),
+    .unit(unit)
+);
+
+seven_segment_driver display (
+    .clk(clk),
+    .reset_n(reset_n),
+    .digit0(unit),
+    .digit1(tens),
+    .digit2(hundreds),
+    .segmentos(segmentos),
+    .anodos(anodos)
+);
 
 endmodule
+
 
 ```
 ### Asignación de pines
@@ -298,7 +292,7 @@ set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.1 Lite Edition"
 ```
 ## Dominio físico inicial (circuito eléctrico):
 
-
+![esquema](Imagenes/esquema.png)
 
 ### Video de implementación y montaje físico
 
