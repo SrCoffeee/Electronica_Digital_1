@@ -43,19 +43,251 @@ Para el dispositivo, se recibira la señal directamente del tomacorriente , dond
 Se tendran tres salidas, 3 paneles 7 segmentos en los cuales se mostrara las unidades, decenas y centenas del la magnitud de la red.
 ## Dominio estructural (red de compuertas lógicas)
 
-### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
+### Esquema de montaje RTL
 
-###  Descripción en lenguaje HDL (Hardware Description Language)
+![esquema](Imagenes/rtl.png)
 
-EL circuito descrito anteriormente se describe en el codigo .v, adjunto a esta entrega.
+### Divisor de frecuencia 
+Se realiza un divisor de frecuencia, con el objetivo e relacionar el clock de la FPGA que es de 50 MHz con uno a la que el ADC0808 pudiese funcionar, en este caso se estableció de 10KHz, para este divisor se implementó el siguiente módulo.
+
+```
+module clk_divider #(
+     parameter integer FREQ_IN = 50000000,
+    parameter integer FREQ_OUT = 10000,
+    parameter integer INIT = 0
+) (
+    // Inputs and output ports
+    input CLK_IN,
+    output reg CLK_OUT = 0
+);
+
+  localparam integer COUNT = (FREQ_IN / FREQ_OUT) / 2;
+  localparam integer SIZE = $clog2(COUNT);
+  localparam integer LIMIT = COUNT - 1;
+
+  // Declaración de señales [reg, wire]
+  reg [SIZE-1:0] count = INIT;
+
+  // Descripción del comportamiento
+  always @(posedge CLK_IN) begin
+    if (count == LIMIT) begin
+      count   <= 0;
+      CLK_OUT <= ~CLK_OUT;
+    end else begin
+      count <= count + 1;
+    end
+  end
+endmodule
+
+```
 
 
+### Conversión binario a BCD
+
+Para ello, implementamos el siguiente módulo en la FPGA, el cual vemos cómo hacemos la equivalencia para centenas, decenas y unidades. Este módulo será el encargado de recibir el número binario a mostrar en el 7 segmentos y lo pone en las unidades correspondientes.
+
+```
+
+module binary_to_bcd (
+    input wire [7:0] binary,
+    output reg [3:0] hundreds,
+    output reg [3:0] tens,
+    output reg [3:0] unit
+);
+
+always @(*) begin
+    hundreds = binary / 100;
+    tens = (binary % 100) / 10;
+    unit = binary % 10;
+end
+
+endmodule
+
+```
+
+### Visualización de 7 segmentos
+Para ello en primer lugar se le asignan las letras que conformanlos 7 segmentos de la FPGA. Posteriormente se la asigna cada número hallado por el módulo *binary_to_bcd* y registra la salida del número al módulo 7 segmentos. Aquí también se le asigna los 3 ánodos correspondientes a centenas, decenas y unidades en los que se mostrará la información.
+
+```
+module seven_segment_driver (
+    input wire clk,
+    input wire reset_n,
+    input wire [3:0] digit0,
+    input wire [3:0] digit1,
+    input wire [3:0] digit2,
+    output reg [6:0] segmentos,
+    output reg [2:0] anodos
+);
+
+reg [1:0] contador;
+reg [15:0] prescaler;
+reg [3:0] digito_actual;
+
+always @(*) begin
+    case (digito_actual)
+        4'h0: segmentos = 7'b1000000;
+        4'h1: segmentos = 7'b1111001;
+        4'h2: segmentos = 7'b0100100;
+        4'h3: segmentos = 7'b0110000;
+        4'h4: segmentos = 7'b0011001;
+        4'h5: segmentos = 7'b0010010;
+        4'h6: segmentos = 7'b0000010;
+        4'h7: segmentos = 7'b1111000;
+        4'h8: segmentos = 7'b0000000;
+        4'h9: segmentos = 7'b0010000;
+        default: segmentos = 7'b1111111;
+    endcase
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        prescaler <= 0;
+        contador <= 0;
+        anodos <= 3'b111;
+    end else begin
+        if (prescaler == 16'd50000) begin
+            prescaler <= 0;
+            case (contador)
+                2'b00: begin
+                    digito_actual <= digit0;
+                    anodos <= 3'b110;
+                end
+                2'b01: begin
+                    digito_actual <= digit1;
+                    anodos <= 3'b101;
+                end
+                2'b10: begin
+                    digito_actual <= digit2;
+                    anodos <= 3'b011;
+                end
+            endcase
+            contador <= contador + 1;
+        end else begin
+            prescaler <= prescaler + 1;
+        end
+    end
+end
+
+endmodule
+
+```
+
+### Módulo top.v
+
+Este módulo encapsula la información de los otros módulos, asociando las entradas y salidas con los pines digitales.
+
+```
+module seven_segment_driver (
+    input wire clk,
+    input wire reset_n,
+    input wire [3:0] digit0,
+    input wire [3:0] digit1,
+    input wire [3:0] digit2,
+    output reg [6:0] segmentos,
+    output reg [2:0] anodos
+);
+
+reg [1:0] contador;
+reg [15:0] prescaler;
+reg [3:0] digito_actual;
+
+always @(*) begin
+    case (digito_actual)
+        4'h0: segmentos = 7'b1000000;
+        4'h1: segmentos = 7'b1111001;
+        4'h2: segmentos = 7'b0100100;
+        4'h3: segmentos = 7'b0110000;
+        4'h4: segmentos = 7'b0011001;
+        4'h5: segmentos = 7'b0010010;
+        4'h6: segmentos = 7'b0000010;
+        4'h7: segmentos = 7'b1111000;
+        4'h8: segmentos = 7'b0000000;
+        4'h9: segmentos = 7'b0010000;
+        default: segmentos = 7'b1111111;
+    endcase
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        prescaler <= 0;
+        contador <= 0;
+        anodos <= 3'b111;
+    end else begin
+        if (prescaler == 16'd50000) begin
+            prescaler <= 0;
+            case (contador)
+                2'b00: begin
+                    digito_actual <= digit0;
+                    anodos <= 3'b110;
+                end
+                2'b01: begin
+                    digito_actual <= digit1;
+                    anodos <= 3'b101;
+                end
+                2'b10: begin
+                    digito_actual <= digit2;
+                    anodos <= 3'b011;
+                end
+            endcase
+            contador <= contador + 1;
+        end else begin
+            prescaler <= prescaler + 1;
+        end
+    end
+end
+
+endmodule
+
+```
 ### Asignación de pines
+```
+##  CONFIGURACIÓN DE PROYECTO agregar en el archivo top.qsf ##
 
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE10E22C8
+set_global_assignment -name TOP_LEVEL_ENTITY top
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY build
+
+# def clk
+set_location_assignment PIN_23 -to clk
+
+# Datos del ADC
+set_location_assignment PIN_28 -to adc_data[0]
+set_location_assignment PIN_30 -to adc_data[1]
+set_location_assignment PIN_31 -to adc_data[2]
+set_location_assignment PIN_32 -to adc_data[3]
+set_location_assignment PIN_33 -to adc_data[4]
+set_location_assignment PIN_34 -to adc_data[5]
+set_location_assignment PIN_38 -to adc_data[6]
+set_location_assignment PIN_39 -to adc_data[7]
+
+# Señales de control
+
+set_location_assignment PIN_52 -to adc_clk
+
+# Asignaciones para los segmentos (a-g)
+set_location_assignment PIN_127 -to segmentos[0]  # Segmento a
+set_location_assignment PIN_126 -to segmentos[1]  # Segmento b
+set_location_assignment PIN_125 -to segmentos[2]  # Segmento c
+set_location_assignment PIN_124 -to segmentos[3]  # Segmento d
+set_location_assignment PIN_121 -to segmentos[4]  # Segmento e
+set_location_assignment PIN_120 -to segmentos[5]  # Segmento f
+set_location_assignment PIN_119 -to segmentos[6]  # Segmento g
+
+# Asignaciones para los ánodos (3 displays)
+set_location_assignment PIN_128 -to anodos[0]     # Ánodo 1 (Display 1)
+set_location_assignment PIN_129 -to anodos[1]     # Ánodo 2 (Display 2)
+set_location_assignment PIN_132 -to anodos[2]     # Ánodo 3 (Display 3)
+
+
+
+
+set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.1 Lite Edition"
+
+```
 ## Dominio físico inicial (circuito eléctrico):
 
-### Esquema de montaje
-![esquema](Imagenes/esquema.png)
+
 
 ### Video de implementación y montaje físico
 
