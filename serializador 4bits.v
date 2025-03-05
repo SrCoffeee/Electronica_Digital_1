@@ -1,12 +1,12 @@
 module serializer_4bit (
     input wire clk,         // Reloj
     input wire rst,        
-    input wire [3:0] din,   
+    input wire [2:0] din,   
     input wire load,        // Señal para cargar la entrada en el registro
     output reg dout         
 );
 
-    reg [3:0] shift_reg; // Registro de desplazamiento
+    reg [2:0] shift_reg; // Registro de desplazamiento
     reg [1:0] bit_count; // Contador de bits
 
     always @(posedge clk or posedge rst) begin
