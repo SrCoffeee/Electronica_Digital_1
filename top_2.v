@@ -7,7 +7,8 @@ module top(
     output reg led,     // Salida para el LED
     output reg buzzer,  // Salida para el buzzer
     output reg [6:0] seg7, // Salida 7 segmentos (a-g)
-    output tx_pin       // Salida UART
+    output tx_pin,      // Salida UART
+    output reg busy     // Indica si el UART está ocupado
 );
 
 // Definición de estados
@@ -31,8 +32,9 @@ parameter SEG_1 = 7'b1001111;
 reg [7:0] byte2send;
 reg tx_start;
 wire tx_done;
+reg [1:0] uart_step = 0;
 
-// Instancia del modulo UART
+// Instancia del módulo UART
 uart_tx_8n1 uart_tx (
     .clk(clk),
     .txbyte(byte2send),
@@ -72,14 +74,52 @@ always @(posedge clk) begin
     endcase
 end
 
-// Enviar datos por UART
+
 always @(posedge clk) begin
-    if (tx_done) begin
-        byte2send <= {6'b000000, current_state}; // Enviar estado actual
-        tx_start <= 1;
-    end else begin
-        tx_start <= 0;
+    if (sensor1 && sensor2 && !busy) begin
+        if (tx_done) begin
+            case (uart_step)
+                0: begin
+                    byte2send <= "a";
+                    tx_start <= 1;
+                    uart_step <= 1;
+                end
+                1: begin
+                    byte2send <= {7'b0000000, led};
+                    tx_start <= 1;
+                    uart_step <= 2;
+                end
+                2: begin
+                    byte2send <= "b";
+                    tx_start <= 1;
+                    uart_step <= 3;
+                end
+                3: begin
+                    byte2send <= {7'b0000000, buzzer};
+                    tx_start <= 1;
+                    uart_step <= 4;
+                end
+                4: begin
+                    byte2send <= "c";
+                    tx_start <= 1;
+                    uart_step <= 5;
+                end
+                5: begin
+                    byte2send <= seg7;
+                    tx_start <= 1;
+                    uart_step <= 0;
+                    busy <= 1;
+                end
+            endcase
+        end else begin
+            tx_start <= 0;
+        end
+    end
+    
+    if (tx_done && uart_step == 0) begin
+        busy <= 0; 
     end
 end
 
 endmodule
+
