@@ -1,0 +1,13 @@
+
+State Machine - |top_2|current_state
+Name current_state.S0 current_state.S2 current_state.S1 
+current_state.S0 0 0 0 
+current_state.S1 1 0 1 
+current_state.S2 1 1 0 
+
+State Machine - |top_2|uart_tx_8n1:uart_tx|state
+Name state.STATE_TXDONE state.STATE_TXING state.STATE_STARTTX state.00000000 
+state.00000000 0 0 0 0 
+state.STATE_STARTTX 0 0 1 1 
+state.STATE_TXING 0 1 0 1 
+state.STATE_TXDONE 1 0 0 1 

@@ -1,6 +1,5 @@
-`include "./uart_tx_8n1.v"
 
-module top(
+module top_2(
     input clk,          // Reloj del sistema
     input sensor1,      // Entrada del sensor 1
     input sensor2,      // Entrada del sensor 2

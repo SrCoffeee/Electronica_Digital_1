@@ -1,0 +1,50 @@
+|top_2
+clk => clk.IN1
+sensor1 => always3.IN0
+sensor2 => always3.IN1
+led <= led~reg0.DB_MAX_OUTPUT_PORT_TYPE
+buzzer <= buzzer~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[0] <= seg7[0]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[1] <= seg7[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[2] <= seg7[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[3] <= seg7[3]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[4] <= seg7[4]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[5] <= seg7[5]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[6] <= seg7[6]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+tx_pin <= uart_tx_8n1:uart_tx.tx
+busy <= busy~reg0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|top_2|uart_tx_8n1:uart_tx
+clk => bits_sent[0].CLK
+clk => bits_sent[1].CLK
+clk => bits_sent[2].CLK
+clk => bits_sent[3].CLK
+clk => bits_sent[4].CLK
+clk => bits_sent[5].CLK
+clk => bits_sent[6].CLK
+clk => bits_sent[7].CLK
+clk => txbit.CLK
+clk => txdone~reg0.CLK
+clk => buf_tx[0].CLK
+clk => buf_tx[1].CLK
+clk => buf_tx[2].CLK
+clk => buf_tx[3].CLK
+clk => buf_tx[4].CLK
+clk => buf_tx[5].CLK
+clk => buf_tx[6].CLK
+clk => buf_tx[7].CLK
+clk => state~4.DATAIN
+txbyte[0] => buf_tx.DATAB
+txbyte[1] => buf_tx.DATAB
+txbyte[2] => buf_tx.DATAB
+txbyte[3] => buf_tx.DATAB
+txbyte[4] => buf_tx.DATAB
+txbyte[5] => buf_tx.DATAB
+txbyte[6] => buf_tx.DATAB
+txbyte[7] => buf_tx.DATAB
+senddata => always0.IN0
+txdone <= txdone~reg0.DB_MAX_OUTPUT_PORT_TYPE
+tx <= txbit.DB_MAX_OUTPUT_PORT_TYPE
+
+

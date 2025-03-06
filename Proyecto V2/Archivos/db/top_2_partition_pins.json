@@ -1,0 +1,49 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "led",
+					"strict" : false
+				},
+				{
+					"name" : "buzzer",
+					"strict" : false
+				},
+				{
+					"name" : "seg7[1]",
+					"strict" : false
+				},
+				{
+					"name" : "seg7[2]",
+					"strict" : false
+				},
+				{
+					"name" : "seg7[3]",
+					"strict" : false
+				},
+				{
+					"name" : "seg7[6]",
+					"strict" : false
+				},
+				{
+					"name" : "tx_pin",
+					"strict" : false
+				},
+				{
+					"name" : "clk",
+					"strict" : false
+				},
+				{
+					"name" : "sensor1",
+					"strict" : false
+				},
+				{
+					"name" : "sensor2",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
