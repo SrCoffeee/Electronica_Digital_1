@@ -1,4 +1,4 @@
-# PROYECTO
+# Laboratorio 4
 
 - Brigitte Vanessa Quiñonez Capera
 - Juan Sebastián Otálora Quiroga
