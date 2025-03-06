@@ -28,7 +28,20 @@ Los circuitos CMOS son ampliamente utilizados en sistemas electrónicos modernos
 
 ## Simulación
 
+
+
 ## Procedimiento
+
+Como se indica en la guia de laboratorio, a este circuito se le da una señal de entrada cuadrada  y se busca su respuesta en el tiempo .
+
+![MONTAJE](images/Imagen%20de%20WhatsApp%202024-11-14%20a%20las%2008.58.07_5139dee8.jpg)
+
+
+![TLL](images/Imagen%20de%20WhatsApp%202024-11-14%20a%20las%2008.58.08_2b6deb1f.jpg
+)
+
+![CMOS](images/Imagen%20de%20WhatsApp%202024-11-14%20a%20las%2008.58.08_99e6522d.jpg
+)
 
 ## Analisis de resultados 
 
