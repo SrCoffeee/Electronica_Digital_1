@@ -42,6 +42,7 @@ Dado que se trata de un primer prototipo con una construcción tosca, el sistema
 
 ## Dominio estructural (red de compuertas lógicas)
 
+![caja_negra](Imagenes/caja_negra.png)
 
 
 ### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
