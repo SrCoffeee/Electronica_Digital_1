@@ -110,10 +110,246 @@ always @(*) begin
 end
 
 endmodule
+### Implementación UART
 
+```
+  // ============================
+  // Lógica de transmisión UART
+  // ============================
+  
+  // Señales para la transmisión UART
+  reg [7:0] tx_data = 8'd0;
+  reg tx_start = 0;
+  wire tx_busy;
+  wire baud_clk;
+  
+  // Cadena "intruso" (códigos ASCII)
+  // i = 0x69, n = 0x6E, t = 0x74, r = 0x72, u = 0x75, s = 0x73, o = 0x6F
+  reg [7:0] intruso [0:6];
+  initial begin
+      intruso[0] = 8'h69;
+      intruso[1] = 8'h6E;
+      intruso[2] = 8'h74;
+      intruso[3] = 8'h72;
+      intruso[4] = 8'h75;
+      intruso[5] = 8'h73;
+      intruso[6] = 8'h6F;
+  end
+  
+  reg [2:0] char_index = 0;
+  reg sending = 0;  // Flag para indicar si se está transmitiendo la cadena
 
+  // Instancia del divisor de frecuencia para generar baud_clk (ajusta FREQ_IN según tu clk)
+  divFreq #(
+      .FREQ_IN(50000000),  // Ejemplo: 50 MHz
+      .FREQ_OUT(9600)
+  ) baud_inst (
+      .CLK_IN(clk),
+      .CLK_OUT(baud_clk)
+  );
+  
+  // Instancia del módulo UART TX
+  uart_tx_8n1 uart_tx_inst (
+      .baud_tick(baud_clk),
+      .tx_data(tx_data),
+      .tx_start(tx_start),
+      .rst( (current_state == S0) ),  // Puedes reiniciar el transmisor al salir de S1
+      .tx(tx),
+      .tx_busy(tx_busy)
+  );
+  
+  // Máquina de estados para el envío de la palabra "intruso"
+  always @(posedge clk) begin
+      if (current_state == S1) begin
+          if (!sending) begin
+              // Inicia la transmisión al entrar en S1
+              sending <= 1;
+              char_index <= 0;
+              tx_data <= intruso[0];
+              tx_start <= 1;  // Pulso para iniciar la transmisión del primer carácter
+          end else begin
+              tx_start <= 0;  // Después del pulso inicial, mantener en 0
+              // Si el transmisor no está ocupado, enviar el siguiente carácter
+              if (!tx_busy && sending) begin
+                  if (char_index < 6) begin
+                      char_index <= char_index + 1;
+                      tx_data <= intruso[char_index + 1];
+                      tx_start <= 1;  // Genera un nuevo pulso para transmitir el siguiente carácter
+                  end else begin
+                      // Se terminó de enviar la cadena
+                      sending <= 0;
+                  end
+              end
+          end
+      end else begin
+          // Si no estamos en S1, se desactiva la transmisión
+          sending <= 0;
+          tx_start <= 0;
+      end
+  end
+  
+endmodule
 
+```
+#### Divisor de frecuencia
+```
+// filename: divFreq.v
+module divFreq #(
+    parameter integer FREQ_IN = 50000000,
+    parameter integer FREQ_OUT = 9600,
+    parameter integer INIT = 0
+) (
+    // Inputs and output ports
+    input CLK_IN,
+    output reg CLK_OUT = 0
+);
+
+  localparam integer COUNT = (FREQ_IN / FREQ_OUT) / 2;
+  localparam integer SIZE = $clog2(COUNT);
+  localparam integer LIMIT = COUNT - 1;
+
+  // Declaración de señales [reg, wire]
+  reg [SIZE-1:0] count = INIT;
+
+  // Descripción del comportamiento
+  always @(posedge CLK_IN) begin
+    if (count == LIMIT) begin
+      count   <= 0;
+      CLK_OUT <= ~CLK_OUT;
+    end else begin
+      count <= count + 1;
+    end
+  end
+endmodule
+```
+#### Modulo UART8N1
+```
+// `include "./divFreq.v"
+`include "./uart_rx_8n1.v"
+`include "./uart_tx_8n1.v"
+
+module uart_8n1 #(
+    parameter integer FREQ_IN  = 50000000,
+    parameter integer FREQ_OUT = 9600
+) (
+    // Inputs and output ports
+    input  wire       hclk,      // Baud tick generado externamente
+    input  wire       rst,       // Reset
+    input  wire       rx,        // Línea de recepción
+    output wire       tx,        // Línea de transmisión
+    input  wire [7:0] tx_data,   // Dato a transmitir
+    input  wire       tx_start,  // Señal para iniciar transmisión
+    output wire       tx_busy,   // Indicador de transmisor ocupado
+    output wire [7:0] rx_data,   // Dato recibido
+    output wire       rx_ready   // Indicador de dato recibido
+);
+
+  // Declaración de señales [reg, wire]
+  wire baud_clk;
+
+  // Descripción del comportamiento
+`ifdef DEBUG
+  assign baud_clk = hclk;
+`else
+  divFreq #(
+      .FREQ_IN (FREQ_IN),
+      .FREQ_OUT(FREQ_OUT)
+  ) baud (
+      .CLK_IN (hclk),
+      .CLK_OUT(baud_clk)
+  );
+`endif
+
+  uart_tx_8n1 uart_tx (
+      .baud_tick(baud_clk),
+      .rst(rst),
+      .tx(tx),
+      .tx_data(tx_data),
+      .tx_start(tx_start),
+      .tx_busy(tx_busy)
+  );
+
+  uart_rx_8n1 uart_rx (
+      .baud_tick(baud_clk),
+      .rst(rst),
+      .rx(rx),
+      .rx_data(rx_data),
+      .rx_ready(rx_ready)
+  );
+
+endmodule
+```
+#### Módulo transmisor de la información 
+```
+module uart_tx_8n1 (
+    input  wire       baud_tick,   // Baud tick generado externamente
+    input  wire [7:0] tx_data,     // Dato a transmitir
+    input  wire       tx_start,    // Señal para iniciar transmisión
+    input  wire       rst,         // Reset
+    output reg        tx = 1,      // Línea de transmisión
+    output reg        tx_busy = 0  // Indicador de transmisor ocupado
+);
+  // Transmisor
+  reg [9:0] tx_shift_reg;  // Start bit + 8 bits de datos + Stop bit
+  reg [3:0] tx_bit_count;
+
+  // Transmisor
+  always @(posedge baud_tick or posedge rst) begin
+    if (rst) begin
+      tx <= 1'b1;  // Línea inactiva IDLE
+      tx_busy <= 0;
+      tx_shift_reg <= 10'b1111111111;
+      tx_bit_count <= 0;
+    end else if (tx_start && !tx_busy) begin
+      tx_shift_reg <= {1'b1, tx_data, 1'b0};  // Stop + Data + Start
+      tx_bit_count <= 0;
+      tx_busy <= 1;
+    end else if (tx_busy) begin
+      tx <= tx_shift_reg[0];
+      tx_shift_reg <= {1'b1, tx_shift_reg[9:1]};  // Shift
+      tx_bit_count <= tx_bit_count + 1;
+      if (tx_bit_count == 10) begin
+        tx_busy <= 0;  // Transmisión completa
+      end
+    end
+  end
+endmodule
+```
 ### Asignación de pines
+```
+##  CONFIGURACIÓN DE PROYECTO agregar en el archivo top.qsf ##
+
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE10E22C8
+set_global_assignment -name TOP_LEVEL_ENTITY top
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY build
+
+# def clk
+set_location_assignment PIN_23 -to clk
+
+# Entradas
+set_location_assignment PIN_32 -to sensor1   # Sensor 1
+set_location_assignment PIN_31 -to sensor2   # Sensor 2
+
+# Salidas
+set_location_assignment PIN_30 -to led       # LED
+set_location_assignment PIN_141 -to buzzer    # Buzzer
+set_location_assignment PIN_50 -to seg7[0]
+set_location_assignment PIN_44 -to seg7[1]
+set_location_assignment PIN_54 -to seg7[2]
+set_location_assignment PIN_51 -to seg7[3]
+set_location_assignment PIN_52 -to seg7[4]
+set_location_assignment PIN_55 -to seg7[5]
+set_location_assignment PIN_58 -to seg7[6]
+set_location_assignment PIN_114 -to tx
+
+set_global_assignment -name LAST_QUARTUS_VERSION "23.1std.1 Lite Edition"
+
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+```
 
 ![pin_planner](imagenes/PIN_PLANNER.png)
 
