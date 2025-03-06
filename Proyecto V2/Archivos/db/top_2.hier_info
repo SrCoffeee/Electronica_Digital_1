@@ -2,17 +2,17 @@
 clk => clk.IN1
 sensor1 => always3.IN0
 sensor2 => always3.IN1
-led <= led~reg0.DB_MAX_OUTPUT_PORT_TYPE
-buzzer <= buzzer~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[0] <= seg7[0]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[1] <= seg7[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[2] <= seg7[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[3] <= seg7[3]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[4] <= seg7[4]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[5] <= seg7[5]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-seg7[6] <= seg7[6]~reg0.DB_MAX_OUTPUT_PORT_TYPE
-tx_pin <= uart_tx_8n1:uart_tx.tx
-busy <= busy~reg0.DB_MAX_OUTPUT_PORT_TYPE
+led << led~reg0.DB_MAX_OUTPUT_PORT_TYPE
+buzzer << buzzer~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[0] << seg7[0]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[1] << seg7[1]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[2] << seg7[2]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[3] << seg7[3]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[4] << seg7[4]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[5] << seg7[5]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+seg7[6] << seg7[6]~reg0.DB_MAX_OUTPUT_PORT_TYPE
+tx_pin << uart_tx_8n1:uart_tx.tx
+busy << busy~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
 |top_2|uart_tx_8n1:uart_tx
