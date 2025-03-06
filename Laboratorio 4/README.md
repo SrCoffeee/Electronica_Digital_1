@@ -368,4 +368,4 @@ Estas advertencias indican conexiones a VDD o a GND de algunos leds del 7 segmen
 
 ## Video de FPGA 
 
-Puedes ver el video de la implementación de la FPGA [aquí](https://www.youtube.com/watch?v=xz67W84lecs)
+Puedes ver el video de la implementación de la FPGA [aquí](https://www.youtube.com/shorts/NIg7JnyLPqM)
