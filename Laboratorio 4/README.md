@@ -50,7 +50,8 @@ Acontinuacion se presenta el diagrama RTL, en donde se puede evidenciar el uso d
 
 
 ##  Descripción en lenguaje HDL (Hardware Description Language)
-
+### Módulo TOP
+```
 module top(
     input clk,          // Reloj del sistema
     input sensor1,      // Entrada del sensor 1
@@ -110,6 +111,8 @@ always @(*) begin
 end
 
 endmodule
+```
+
 ### Implementación UART
 
 ```
@@ -351,7 +354,6 @@ set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 ```
 
-![pin_planner](imagenes/PIN_PLANNER.png)
 
 ## Síntesis en FPGA (dominio físico final)
 
