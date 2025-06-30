@@ -1,7 +1,0 @@
-build/
-sim/
-db/
-incremental_db/
-*.log
-template/
-

@@ -1,83 +1,55 @@
-# Voltimetro
+# PROYECTO
+
 - Brigitte Vanessa Quiñonez Capera
 - Juan Sebastián Otálora Quiroga
 - Carlos Fernando Quintero Castillo
 
 ## Introducción
 
-En esta práctica se desarrollará un voltímetro basado en FPGA, utilizando un circuito de rectificación y un transformador de 120V a 5V para la conversión de tensión. Además, se empleará el conversor analógico-digital ADC0808 para digitalizar la señal y permitir su procesamiento dentro de la FPGA. Los valores medidos serán visualizados en un display de 7 segmentos, permitiendo una lectura clara del voltaje.
-
-El objetivo de la práctica es diseñar un sistema de medición de voltaje que integre distintos componentes electrónicos para la adquisición, procesamiento y visualización de datos. Para ello, se acondicionará la señal proveniente de la red eléctrica mediante un transformador y un circuito rectificador, seguido de la conversión digital con el ADC0808. Posteriormente, la FPGA interpretará los datos y controlará el display de 7 segmentos para mostrar el voltaje medido en tiempo real.
-
-A través de esta práctica, se analizará el funcionamiento de cada uno de los componentes involucrados y se explorará la integración de hardware y software en sistemas de medición con dispositivos programables, enfatizando la conversión y visualización de señales analógicas en formato digital.
+Este proyecto implementa un sistema de monitoreo en una FPGA, utilizando un sensor de vibración y un sensor de movimiento para detectar anomalías en entornos industriales o de seguridad. La FPGA procesará las señales en tiempo real, permitiendo una respuesta rápida ante eventos críticos. La comunicación con un PC mediante UART facilitará la visualización y el análisis de los datos recopilados, optimizando la eficiencia y confiabilidad del sistema.
 
 ## Dominio comportamental (especificación y algoritmo)
 
-El comportamiento de esta práctica se basa en la adquisición, procesamiento y visualización de una señal de voltaje de entrada utilizando una FPGA. Para ello, se emplean distintos módulos electrónicos que trabajan en conjunto para convertir una señal analógica de la red eléctrica en una lectura digital legible en un display de 7 segmentos.
-
-### Reducción de voltaje:
-La señal de 120V de corriente alterna (CA) se reduce a 5V CA mediante un transformador.
-
-### Rectificación y acondicionamiento de señal:
-Un circuito rectificador convierte la señal de CA en corriente continua pulsante.
-Se puede incluir un filtro de condensador para suavizar la señal y reducir las ondulaciones antes del muestreo.
-
-### Conversión analógico-digital (ADC0808):
-La señal continua se introduce en el ADC0808, que la convierte en una señal digital de 8 bits.
-El ADC trabaja mediante un proceso de muestreo y cuantificación, enviando los datos digitales a la FPGA.
+El dominio comportamental de este sistema se centra en la detección y alerta de eventos mediante la combinación de sensores de vibración y movimiento. Cada sensor actúa como una entrada digital a la FPGA, activándose cuando se detecta una vibración o un movimiento significativo. Si cualquiera de los sensores se activa de manera individual, el sistema registra el evento, pero si ambos sensores se activan simultáneamente, se genera una respuesta combinada. En este caso, el sistema activa una salida sonora, como una alarma, y visualiza un código de advertencia en un display de 7 segmentos. Esta lógica garantiza una respuesta rápida y efectiva ante posibles situaciones anómalas, proporcionando un sistema de monitoreo confiable y en tiempo real.
 
 ### Procesamiento en la FPGA:
-La FPGA recibe los datos digitales del ADC0808 y los procesa para interpretar el valor del voltaje medido.
-Se realiza un mapeo adecuado de los valores binarios obtenidos a un formato decimal.
 
-### Visualización en el display de 7 segmentos:
-La FPGA controla un display de 7 segmentos, convirtiendo el dato procesado en señales de control para encender los segmentos correspondientes.
-Esto permite mostrar el voltaje medido en tiempo real de forma clara y precisa.
+El sistema recibe como entradas las señales provenientes de un sensor de vibración y un sensor de movimiento, los cuales generan niveles lógicos según la detección de eventos. Estas señales son procesadas por una máquina de estados implementada en la FPGA, que evalúa las condiciones de activación de los sensores y determina el estado del sistema. Dependiendo de la combinación de entradas, la máquina de estados activa las salidas correspondientes, como una alerta sonora y una visualización en un display de 7 segmentos cuando ambos sensores están activos simultáneamente.
+
+Para facilitar el monitoreo remoto, los estados de salida del sistema se serializan y se transmiten a través del puerto UART integrado en la FPGA. Esta información puede ser recibida y visualizada en una consola de PC, permitiendo un análisis en tiempo real de los eventos detectados. De este modo, el sistema no solo ofrece una respuesta inmediata a través de sus salidas físicas, sino que también proporciona un medio de supervisión y registro de datos para su análisis posterior.
 
 ### Caja negra
 
-![caja_negra](Imagenes/caja_negra.png)
+
 
 
 #### Entradas
 
-Para el dispositivo, se recibira la señal directamente del tomacorriente , donde se recivira la onda AC.
+Al dispositivo ingresan las señales del sensor de vibracion y del sensor de movimiento, estos envian un pulso al momento de recibir estimulacion externa y se conectan directamente a la FPGA sin algun adaptador extra.
 
 #### Salidas
 
-Se tendran tres salidas, 3 paneles 7 segmentos en los cuales se mostrara las unidades, decenas y centenas del la magnitud de la red.
+Consisten en una salida sonora de alerta, ademas de un aviso en panel 7 segmentosa de manra que alertara en informara al usuario de movimientos en el entorno.
 
 ### Tabla de verdad 
-En la siguiente imagen se muestran unos de los casos del sistema, en resumen al ingresar la señal de 8bits saliente del ADC, estos seran transformados en la señal optima para ser presentado en los display 7 segmentos, por lo que primero se separan por unidades, decenas y centenas y estos valores con convertidos a base 10 y presentados en los displays.
-
-![Tabla de Verdad](Imagenes/TABLA%20DE%20VERDAD.png)
 
 
-## Dominio físico inicial (circuito eléctrico):
+## Dominio físico:
 
-La primer fase del dispositivo es la toma de la señal de la red, se transforma a una señal rectificada cercana a los 5V, parasa por un diodo Zener con conexion shunt, de manera ue se regula la tension de salida, este valor DC ingresa al ADC para tener una salida de 8bits que ira a la FPGA.
+El dominio físico del dispositivo está compuesto por una FPGA Cyclone IV, encargada de gestionar las señales de entrada y controlar las salidas. Los sensores de vibración y movimiento están conectados directamente a la FPGA a través de pines GPIO, funcionando con niveles lógicos compatibles. Las salidas incluyen un buzzer para la alerta sonora y un display de 7 segmentos para la visualización de estados, ambos controlados mediante señales digitales generadas por la FPGA.
+
+Dado que se trata de un primer prototipo con una construcción tosca, el sistema está montado sobre una placa de pruebas (protoboard) o un PCB básico con cableado expuesto, sin una carcasa protectora ni optimización en la disposición de los componentes. La comunicación con la consola del PC se realiza a través del puerto UART, utilizando un convertidor USB-UART para la transmisión de datos. Este diseño inicial permite validar el funcionamiento lógico del sistema antes de una futura optimización en términos de tamaño, consumo y robustez.
 
 ## Dominio estructural (red de compuertas lógicas)
 
-Gracias a la descriocion de la tabla de verdad, es posible determinar el circuito digital que pueda realizar la trtansformacion de la informacion para darle el uso deseado.
+![caja_negra](Imagenes/caja_negra.png)
 
-![Conversor 8Bits a decimal](Imagenes/BIN.DEC27SEG.png)
-
-Ya con la informacion de esta manera, se convierte la señal por medio de un driver a 7 segmentos, para hacer uso de los 7 segmentos incorporados en la FPGA.
-
-![Conversor 8Bits a decimal](Imagenes/BIN2DEC%208BITS.png)
-
-Por ultimo se simula con un panel 7 segmentos propio de DIGITAL, en donde se comprueba el correcto funcionamiento del dispositivo.
-
-![Conversor 8Bits a decimal](Imagenes/BIN.DEC27SEG%20TEST.png)
 
 ### Diagramas, tablas de verdad, simulaciones, mapas de Karnaugh, compuertas universales, LUT y suma de productos.
 
 
 
 ##  Descripción en lenguaje HDL (Hardware Description Language)
-
-EL circuito descrito anteriormente se describe en el codigo .v, adjunto a esta entrega.
 
 
 ### Asignación de pines

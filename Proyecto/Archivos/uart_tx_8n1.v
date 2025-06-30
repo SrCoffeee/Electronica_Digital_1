@@ -1,33 +1,74 @@
-module uart_tx_8n1 (
-    input  wire       baud_tick,   // Baud tick generado externamente
-    input  wire [7:0] tx_data,     // Dato a transmitir
-    input  wire       tx_start,    // Señal para iniciar transmisión
-    input  wire       rst,         // Reset
-    output reg        tx = 1,      // Línea de transmisión
-    output reg        tx_busy = 0  // Indicador de transmisor ocupado
-);
-  // Transmisor
-  reg [9:0] tx_shift_reg;  // Start bit + 8 bits de datos + Stop bit
-  reg [3:0] tx_bit_count;
+// 8N1 UART Module, transmit only
 
-  // Transmisor
-  always @(posedge baud_tick or posedge rst) begin
-    if (rst) begin
-      tx <= 1'b1;  // Línea inactiva IDLE
-      tx_busy <= 0;
-      tx_shift_reg <= 10'b1111111111;
-      tx_bit_count <= 0;
-    end else if (tx_start && !tx_busy) begin
-      tx_shift_reg <= {1'b1, tx_data, 1'b0};  // Stop + Data + Start
-      tx_bit_count <= 0;
-      tx_busy <= 1;
-    end else if (tx_busy) begin
-      tx <= tx_shift_reg[0];
-      tx_shift_reg <= {1'b1, tx_shift_reg[9:1]};  // Shift
-      tx_bit_count <= tx_bit_count + 1;
-      if (tx_bit_count == 10) begin
-        tx_busy <= 0;  // Transmisión completa
-      end
+module uart_tx_8n1 (
+    clk,        // input clock
+    txbyte,     // outgoing byte
+    senddata,   // trigger tx
+    txdone,     // outgoing byte sent
+    tx,         // tx wire
+    );
+
+    /* Inputs */
+    input clk;
+    input[7:0] txbyte;
+    input senddata;
+
+    /* Outputs */
+    output txdone;
+    output tx;
+
+    /* Parameters */
+    parameter STATE_IDLE=8'd0;
+    parameter STATE_STARTTX=8'd1;
+    parameter STATE_TXING=8'd2;
+    parameter STATE_TXDONE=8'd3;
+
+    /* State variables */
+    reg[7:0] state=8'b0;
+    reg[7:0] buf_tx=8'b0;
+    reg[7:0] bits_sent=8'b0;
+    reg txbit=1'b1;
+    reg txdone=1'b0;
+
+    /* Wiring */
+    assign tx=txbit;
+
+    /* always */
+    always @ (posedge clk) begin
+        // start sending?
+        if (senddata == 1 && state == STATE_IDLE) begin
+            state <= STATE_STARTTX;
+            buf_tx <= txbyte;
+            txdone <= 1'b0;
+        end else if (state == STATE_IDLE) begin
+            // idle at high
+            txbit <= 1'b1;
+            txdone <= 1'b0;
+        end
+
+        // send start bit (low)
+        if (state == STATE_STARTTX) begin
+            txbit <= 1'b0;
+            state <= STATE_TXING;
+        end
+        // clock data out
+        if (state == STATE_TXING && bits_sent < 8'd8) begin
+            txbit <= buf_tx[0];
+            buf_tx <= buf_tx>>1;
+            bits_sent = bits_sent + 1;
+        end else if (state == STATE_TXING) begin
+            // send stop bit (high)
+            txbit <= 1'b1;
+            bits_sent <= 8'b0;
+            state <= STATE_TXDONE;
+        end
+
+        // tx done
+        if (state == STATE_TXDONE) begin
+            txdone <= 1'b1;
+            state <= STATE_IDLE;
+        end
+
     end
-  end
+
 endmodule

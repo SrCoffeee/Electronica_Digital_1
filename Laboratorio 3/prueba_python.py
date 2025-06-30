@@ -1,3 +1,0 @@
-numero_a_convertir=255
-
-centenas=numero_a_convertir/100
